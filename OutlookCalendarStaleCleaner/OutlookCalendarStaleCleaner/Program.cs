@@ -1,4 +1,5 @@
-﻿using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using System.Runtime.InteropServices;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace OutlookCalendarStaleCleaner
 {
@@ -11,6 +12,7 @@ namespace OutlookCalendarStaleCleaner
       public static int Deleted = 0;
       public static int MarkedTenative = 0;
       public static int Ignored = 0;
+      public static int Exceptions = 0;
     }
 
     private static void Usage()
@@ -27,6 +29,8 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 
     public static async Task Main(string[] args)
     {
+      Console.OutputEncoding = System.Text.Encoding.UTF8;
+
       if (args.Length > 0) 
       {
         Usage();
@@ -46,9 +50,10 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 
       Console.WriteLine("\n---------------\n");
       Console.WriteLine("🏁 Completed!");
-      Console.WriteLine($"  🙈 Ignored         : {Stats.Ignored}");
-      Console.WriteLine($"  ⛺ Marked Tentative: {Stats.MarkedTenative}");
-      Console.WriteLine($"  ❌ Deleted         : {Stats.Deleted}");
+      Console.WriteLine($"  🙈 Ignored          : {Stats.Ignored}");
+      Console.WriteLine($"  ⛺ Marked Tentative : {Stats.MarkedTenative}");
+      Console.WriteLine($"  ❌ Deleted          : {Stats.Deleted}");
+      Console.WriteLine($"  ⚠️ Exceptions       : {Stats.Exceptions}");
     }
 
     private static void CleanStaleItems(Outlook.Folder folder)
@@ -62,7 +67,19 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 
         if (meeting != null)
         {
-          var appointment = meeting.GetAssociatedAppointment(true);
+          Outlook.AppointmentItem? appointment = null;
+
+          try
+          {
+            appointment = meeting.GetAssociatedAppointment(true);
+          }
+          catch (COMException e)
+          {
+            Console.WriteLine($"⚠️ Exception accessing meeting with subject: '{meeting.Subject}')");
+            Console.WriteLine(e.Message);
+            Stats.Exceptions++;
+            continue;
+          }
 
           // appointment will be null when it has been deleted manually from the calendar but the
           // mail item is still there
@@ -76,7 +93,10 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
           }
           else
           {
+            // disable incorrect warning, since appointment != null is covered by the if
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             Console.WriteLine($"✉️ {appointment.Subject}");
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
             Console.WriteLine($"  📧 From: {appointment.Organizer}");
             Console.WriteLine($"  📆 Scheduled: {appointment.Start} -> {appointment.End}");
             Console.WriteLine($"  🗿 Response Status: {appointment.ResponseStatus}");

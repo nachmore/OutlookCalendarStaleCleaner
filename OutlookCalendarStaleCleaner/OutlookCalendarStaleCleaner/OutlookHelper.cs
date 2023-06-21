@@ -50,7 +50,7 @@ namespace OutlookCalendarStaleCleaner
       //       See: https://docs.microsoft.com/en-us/dotnet/api/microsoft.office.interop.outlook._stores.item?view=outlook-pia#Microsoft_Office_Interop_Outlook__Stores_Item_System_Object_
       for (int i = 1; i <= stores?.Count; i++)
         {
-          Outlook.Store store = null;
+          Outlook.Store? store = null;
 
           try
           {
