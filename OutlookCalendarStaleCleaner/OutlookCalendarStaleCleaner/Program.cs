@@ -37,16 +37,22 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
         return;
       }
 
-      var folders = await OutlookHelper.GetInboxes(false);
+      int lastDeleted = 0;
 
-      foreach (var folder in folders)
-      {
-        Console.WriteLine($"🔃 Processing Inbox Folder: {folder.FolderPath}");
+      do {
+        lastDeleted = Stats.Deleted;
 
-        CleanStaleItems(folder);
+        var folders = await OutlookHelper.GetInboxes(false);
 
-        Console.WriteLine($"✅ Finished Processing Inbox Folder: {folder.FolderPath}\n");
-      }
+        foreach (var folder in folders)
+        {
+          Console.WriteLine($"🔃 Processing Inbox Folder: {folder.FolderPath}");
+
+          CleanStaleItems(folder);
+
+          Console.WriteLine($"✅ Finished Processing Inbox Folder: {folder.FolderPath}\n");
+        }
+      } while ( Stats.Deleted != lastDeleted );
 
       Console.WriteLine("\n---------------\n");
       Console.WriteLine("🏁 Completed!");

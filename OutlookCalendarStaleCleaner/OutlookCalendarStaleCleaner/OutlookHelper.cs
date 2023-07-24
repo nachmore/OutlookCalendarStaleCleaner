@@ -75,7 +75,7 @@ namespace OutlookCalendarStaleCleaner
             // says it is there. In those cases you'll see something like:
             //  System.Runtime.InteropServices.COMException (0x80040119): Outlook cannot start because a data file to
             //  send and receive messages cannot be found. Check your settings in this Microsoft Outlook profile. <snip>
-            Debug.WriteLine($"Failed to get Inbo for {store?.DisplayName} type: {store?.ExchangeStoreType}:\n{e}");
+            Debug.WriteLine($"Failed to get Inbox for {store?.DisplayName} type: {store?.ExchangeStoreType}:\n{e}");
           }
         }
 
