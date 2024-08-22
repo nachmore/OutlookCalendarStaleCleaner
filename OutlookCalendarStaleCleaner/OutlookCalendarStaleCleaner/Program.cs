@@ -29,7 +29,7 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 
     public static async Task Main(string[] args)
     {
-      Console.OutputEncoding = System.Text.Encoding.UTF8;
+      //Console.Out8putEncoding = System.Text.Encoding.UTF8;
 
       if (args.Length > 0) 
       {
@@ -105,6 +105,7 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
             Console.WriteLine($"  📧 From: {appointment.Organizer}");
             Console.WriteLine($"  📆 Scheduled: {appointment.Start} -> {appointment.End}");
+            Console.WriteLine($"  🔃 Recurrence: {appointment.RecurrenceState}");
             Console.WriteLine($"  🗿 Response Status: {appointment.ResponseStatus}");
             Console.WriteLine($"  🚩 Meeting Status: {appointment.MeetingStatus}");
 
