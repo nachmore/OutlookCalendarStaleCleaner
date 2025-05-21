@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace OutlookCalendarStaleCleaner
@@ -29,7 +31,7 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 
     public static async Task Main(string[] args)
     {
-      //Console.Out8putEncoding = System.Text.Encoding.UTF8;
+      Console.OutputEncoding = System.Text.Encoding.UTF8;
 
       if (args.Length > 0) 
       {
