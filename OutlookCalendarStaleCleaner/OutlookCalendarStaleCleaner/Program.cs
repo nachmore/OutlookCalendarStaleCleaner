@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Office.Interop.Outlook;
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -15,6 +18,7 @@ namespace OutlookCalendarStaleCleaner
       public static int MarkedTenative = 0;
       public static int Ignored = 0;
       public static int Exceptions = 0;
+      public static int AllDayAccepted = 0;
     }
 
     private static void Usage()
@@ -58,6 +62,7 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 
       Console.WriteLine("\n---------------\n");
       Console.WriteLine("🏁 Completed!");
+      Console.WriteLine($"  ☀️ All-Day Accepted : {Stats.AllDayAccepted}");
       Console.WriteLine($"  🙈 Ignored          : {Stats.Ignored}");
       Console.WriteLine($"  ⛺ Marked Tentative : {Stats.MarkedTenative}");
       Console.WriteLine($"  ❌ Deleted          : {Stats.Deleted}");
@@ -120,6 +125,11 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
 
             if (!processed)
             {
+              processed = ProcessAllDayNonBlockingRequest(appointment);
+            }
+
+            if (!processed)
+            {
               Stats.Ignored++;
               Console.WriteLine(" -> 🙈 Ignored");
               continue;
@@ -137,6 +147,23 @@ Simple program to clean stale calendar invites sitting in your inbox. This tool 
           }
         }
       }
+    }
+
+    private static bool ProcessAllDayNonBlockingRequest(AppointmentItem appointment)
+    {
+      if (appointment.AllDayEvent && appointment.BusyStatus == OlBusyStatus.olFree)
+      {
+        appointment.MeetingStatus = OlMeetingStatus.olMeetingReceived;
+        appointment.Respond(OlMeetingResponse.olMeetingAccepted, true, false);
+
+        Stats.AllDayAccepted++;
+
+        Console.WriteLine($"  ☀️ All Day (show-as-free) Meeting: Yes");
+
+        return true;
+      }
+
+      return false;
     }
 
     private static bool ProcessMeetingRequest(Outlook.AppointmentItem appointment)
